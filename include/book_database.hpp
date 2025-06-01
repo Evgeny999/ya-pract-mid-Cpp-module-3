@@ -3,6 +3,7 @@
 #include <print>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #include "book.hpp"
@@ -14,13 +15,16 @@ namespace bookdb {
 template <BookContainerLike BookContainer = std::vector<Book>>
 class BookDatabase {
 public:
-    // Type aliases
-
-    // Ваш код здесь
-
-    using AuthorContainer = BookContainer /* Ваш код здесь */;
+    using BookIterator = BookContainer::iterator;
+    using AuthorContainer = std::unordered_set<std::string>;
 
     BookDatabase() = default;
+    BookDatabase(std::initializer_list<Book> book_list) {
+        for (const auto &book : book_list) {
+            books_.push_back(book);
+            InsertAuthor(book.author);
+        }
+    }
 
     void Clear() {
         books_.clear();
@@ -29,9 +33,33 @@ public:
 
     // Standard container interface methods
 
+    size_t size() const { return books_.size(); }
+
+    BookContainer GetBooks() const { return books_; }
+    AuthorContainer GetAuthors() const { return authors_; }
+    void PushBack(const Book &b) {
+        books_.push_back(b);
+        InsertAuthor(b.author);
+    }
+
+    void EmplaceBack(std::string_view author, std::string_view title, int year, Genre genre, double rating,
+                     int read_count) {
+        books_.emplace_back(author, title, year, genre, rating, read_count);
+        InsertAuthor(author);
+    }
+
+    BookIterator begin() const { return books_.begin(); }
+    BookIterator end() const { return books_.end(); }
+
     // Ваш код здесь
 
 private:
+    // Помещаем имя автора в authors_. string_view в соответствующем элементе вектора books_ будет "указывать" на него
+    void InsertAuthor(std::string_view author) {
+        authors_.insert(std::string{author});
+        books_.back().author = *authors_.find(std::string{books_.back().author});
+    }
+
     BookContainer books_;
     AuthorContainer authors_;
 };
@@ -43,9 +71,8 @@ template <>
 struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
     template <typename FormatContext>
     auto format(const bookdb::BookDatabase<std::vector<bookdb::Book>> &db, FormatContext &fc) const {
-        /*
-        Раскомментируйте, когда bookdb::BookDatabase поддержит интерфейсы, доступные стандартным контейнерам
-        (size/begin/...)
+
+        db.size();
 
         format_to(fc.out(), "BookDatabase (size = {}): ", db.size());
 
@@ -58,7 +85,7 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
         for (const auto &author : db.GetAuthors()) {
             format_to(fc.out(), "- {}\n", author);
         }
-        */
+
         return fc.out();
     }
 
