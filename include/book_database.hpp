@@ -42,14 +42,15 @@ public:
         InsertAuthor(b.author);
     }
 
-    void EmplaceBack(std::string_view author, std::string_view title, int year, Genre genre, double rating,
+    void EmplaceBack(std::string_view title, std::string_view author, int year, Genre genre, double rating,
                      int read_count) {
-        books_.emplace_back(author, title, year, genre, rating, read_count);
+        books_.emplace_back(title, author, year, genre, rating, read_count);
         InsertAuthor(author);
     }
 
-    BookIterator begin() const { return books_.begin(); }
-    BookIterator end() const { return books_.end(); }
+    // Правильно const
+    BookIterator begin() /*const*/ { return books_.begin(); }
+    BookIterator end() /*const*/ { return books_.end(); }
 
     // Ваш код здесь
 

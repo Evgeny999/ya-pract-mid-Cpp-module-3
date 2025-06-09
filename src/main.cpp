@@ -33,6 +33,9 @@ int main() {
     db.EmplaceBack("Lord of the Flies", "William Golding", 1954, Genre::Fiction, 4.2, 89);
     std::print("Books: {}\n\n", db);
 
+    calculateGenreRatings(db);
+    calculateAverageRating(db);
+    sampleRandomBooks(db, 10);
     // Sorts
     /*std::sort(db.begin(), db.end(), comp::LessByAuthor{});
     std::print("Books sorted by author: {}\n\n==================\n", db);

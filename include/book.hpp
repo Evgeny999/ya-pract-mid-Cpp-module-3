@@ -32,25 +32,23 @@ constexpr Genre GenreFromString(std::string_view s) {
 
 struct Book {
 
-    constexpr Book(std::string_view author, std::string_view title, int year, std::string_view genre, double rating,
+    constexpr Book(std::string_view title, std::string_view author, int year, std::string_view genre, double rating,
                    int read_count)
-        : author(author), title(title), year(year), genre(GenreFromString(genre)), rating(rating),
+        : title(title), author(author), year(year), genre(GenreFromString(genre)), rating(rating),
           read_count(read_count) {}
 
-    constexpr Book(std::string_view author, std::string_view title, int year, Genre genre, double rating,
+    constexpr Book(std::string_view title, std::string_view author, int year, Genre genre, double rating,
                    int read_count)
-        : author(author), title(title), year(year), genre(genre), rating(rating), read_count(read_count) {}
+        : title(title), author(author), year(year), genre(genre), rating(rating), read_count(read_count) {}
 
     // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом контейнере
-    std::string_view author;
     std::string title;
+    std::string_view author;
 
     int year;
     Genre genre;
     double rating;
     int read_count;
-
-    // Ваш код для конструкторов здесь
 };
 
 }  // namespace bookdb
@@ -112,3 +110,27 @@ struct formatter<bookdb::Book, char> {
 };
 
 }  // namespace std
+
+constexpr auto YearBetween(int start, int end) {
+    return [start, end](const bookdb::Book &book) { return book.year >= start && book.year <= end; };
+}
+
+constexpr auto RatingAbove(double rating) {
+    return [rating](const bookdb::Book &book) { return book.rating >= rating; };
+}
+
+constexpr auto GenreIs(bookdb::Genre genre) {
+    return [genre](const bookdb::Book &book) { return book.genre >= genre; };
+}
+
+template <class InputIt, class... UnaryPred>
+constexpr bool all_of(InputIt first, InputIt last, UnaryPred... p) {
+    // вернём true, если число преданных передикатов равно нулю
+    return (true && ... && (std::find_if_not(first, last, p) == last));
+}
+
+template <class InputIt, class... UnaryPred>
+constexpr bool any_of(InputIt first, InputIt last, UnaryPred... p) {
+    // вернём false, если число преданных передикатов равно нулю
+    return (false || ... || (std::find_if_not(first, last, p) != last));
+}
