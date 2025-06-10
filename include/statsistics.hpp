@@ -106,4 +106,12 @@ auto sampleRandomBooks(/*const*/ BookDatabase<T> &cont, size_t num_books) {
     return result;
 }
 
+template <BookContainerLike T>
+auto getTopNBy(BookDatabase<T> &cont, int num) {
+    std::partial_sort(cont.begin(), cont.begin() + num, cont.end(),
+                      [](const auto &lhs, const auto &rhs) { return lhs.rating > rhs.rating; });
+    std::vector<std::reference_wrapper<const bookdb::Book>> result(cont.begin(), cont.begin() + num);
+    return result;
+}
+
 }  // namespace bookdb

@@ -134,3 +134,8 @@ constexpr bool any_of(InputIt first, InputIt last, UnaryPred... p) {
     // вернём false, если число преданных передикатов равно нулю
     return (false || ... || (std::find_if_not(first, last, p) != last));
 }
+
+template <class... UnaryPred>
+constexpr bool all_of(UnaryPred... p) {
+    return true;
+}
