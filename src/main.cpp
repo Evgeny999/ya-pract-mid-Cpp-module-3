@@ -36,19 +36,20 @@ int main() {
     filterBooks(db.begin(), db.end(), all_of(YearBetween(1900, 1999), RatingAbove(4.5)));
 
     // Sorts
-    /*std::sort(db.begin(), db.end(), comp::LessByAuthor{});
+    std::sort(db.begin(), db.end(), comp::LessByAuthor{});
     std::print("Books sorted by author: {}\n\n==================\n", db);
 
-    std::sort(db.begin(), db.end(), comp::LessByPopularity{});
+    std::sort(db.begin(), db.end(), comp::LessByRating{});
     std::print("Books sorted by popularity: {}\n\n==================\n", db);
 
     // Author histogram
     auto histogram = buildAuthorHistogramFlat(db);
-    std::print("Author histogram: {}", histogram);
+    std::print("Author histogram: \n{}", histogram);
 
     // Ratings
-    auto genreRatings = calculateGenreRatings(db.begin(), db.end());
-    std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
+    // auto genreRatings = calculateGenreRatings(db.begin(), db.end());
+    auto genreRatings = calculateGenreRatings(db);
+    std::print("\n\nAverage ratings by genres: \n{}\n", genreRatings);
 
     auto avrRating = calculateAverageRating(db);
     std::print("Average books rating in library: {}\n", avrRating);
@@ -59,7 +60,8 @@ int main() {
     std::for_each(filtered.cbegin(), filtered.cend(), [](const auto &v) { std::print("{}\n", v.get()); });
 
     // Top 3 books
-    auto topBooks = getTopNBy(db, 3, comp::LessByRating{});
+    // Чтобы получать topN, нужно же использовать greater? у авторов comp::LessByRating{}
+    auto topBooks = getTopNBy(db, 3, comp::GreaterByRating{} /*comp::LessByRating{}*/);
     std::print("\n\nTop 3 books by rating:\n");
     std::for_each(topBooks.cbegin(), topBooks.cend(), [](const auto &v) { std::print("{}\n", v.get()); });
 
@@ -67,7 +69,6 @@ int main() {
     if (orwellBookIt != db.end()) {
         std::print("\n\nTransparent lookup by authors. Found Orwell's book: {}\n", *orwellBookIt);
     }
-    */
 
     return 0;
 }

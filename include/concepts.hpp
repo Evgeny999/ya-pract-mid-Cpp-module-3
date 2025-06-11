@@ -17,7 +17,7 @@ template <typename T>
 concept BookIterator = true;
 
 template <typename S, typename I>
-concept BookSentinel = true;
+concept BookSentinel = std::sentinel_for<S, I>;
 
 template <typename P>
 concept BookPredicate = true;

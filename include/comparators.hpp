@@ -9,27 +9,39 @@
 namespace bookdb::comp {
 
 struct LessByAuthor {
-    constexpr bool operator()(std::string_view &lhs, std::string_view &rhs) const { return lhs < rhs; }
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const {
+        return lhs.author < rhs.author;
+    }
 };
 
 struct LessByTitle {
-    constexpr bool operator()(std::string &lhs, std::string &rhs) const { return lhs < rhs; }
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const { return lhs.title < rhs.title; }
 };
 
 struct LessByYear {
-    constexpr bool operator()(int lhs, int rhs) const { return lhs < rhs; }
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const { return lhs.year < rhs.year; }
 };
 
 struct LessByGenre {
-    constexpr bool operator()(Genre lhs, Genre rhs) const { return lhs < rhs; }
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const { return lhs.genre < rhs.genre; }
 };
 
 struct LessByRating {
-    constexpr bool operator()(double lhs, double rhs) const { return lhs < rhs; }
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs, double epsilon = DBL_EPSILON) const {
+        return lhs.rating < (rhs.rating - epsilon);
+    }
+};
+// Чтобы получать topN, нужно же использовать greater?
+struct GreaterByRating {
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs, double epsilon = DBL_EPSILON) const {
+        return lhs.rating > (rhs.rating - epsilon);
+    }
 };
 
 struct LessByReadCount {
-    constexpr bool operator()(int lhs, int rhs, double epsilon = DBL_EPSILON) const { return lhs < (rhs - epsilon); }
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const {
+        return lhs.read_count < rhs.read_count;
+    }
 };
 
 }  // namespace bookdb::comp

@@ -16,6 +16,7 @@ template <BookContainerLike BookContainer = std::vector<Book>>
 class BookDatabase {
 public:
     using BookIterator = BookContainer::iterator;
+    using BookConstIterator = BookContainer::const_iterator;
     using AuthorContainer = std::unordered_set<std::string>;
 
     BookDatabase() = default;
@@ -48,11 +49,12 @@ public:
         InsertAuthor(author);
     }
 
-    // Правильно const
+    // Правильно const?
     BookIterator begin() /*const*/ { return books_.begin(); }
     BookIterator end() /*const*/ { return books_.end(); }
 
-    // Ваш код здесь
+    BookConstIterator cbegin() const { return books_.cbegin(); }
+    BookConstIterator cend() const { return books_.cend(); }
 
 private:
     // Помещаем имя автора в authors_. string_view в соответствующем элементе вектора books_ будет "указывать" на него
@@ -82,10 +84,10 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
             format_to(fc.out(), "- {}\n", book);
         }
 
-        format_to(fc.out(), "Authors:\n");
+        /*format_to(fc.out(), "Authors:\n");
         for (const auto &author : db.GetAuthors()) {
             format_to(fc.out(), "- {}\n", author);
-        }
+        }*/
 
         return fc.out();
     }

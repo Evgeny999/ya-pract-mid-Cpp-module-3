@@ -1,9 +1,13 @@
 #pragma once
 
+#include <algorithm>
+#include <flat_map>
 #include <format>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace bookdb {
 
@@ -101,7 +105,58 @@ struct formatter<bookdb::Book, char> {
             }
 
         // clang-format on
-        return format_to(fc.out(), "{} {} {} {} {} {}", b.author, b.title, b.year, genre_str, b.rating, b.read_count);
+        return format_to(fc.out(), "{} {} {} {} {} {}", b.author, b.title, b.year, b.genre, b.rating, b.read_count);
+    }
+
+    constexpr auto parse(format_parse_context &ctx) {
+        return ctx.begin();  // Просто игнорируем пользовательский формат
+    }
+};
+
+template <>
+struct formatter<std::flat_map<std::string, int>, char> {
+    template <typename FormatContext>
+    auto format(const std::flat_map<std::string, int> &m, FormatContext &fc) const {
+        std::stringstream result_string;
+
+        std::for_each(m.begin(), m.end(), [&result_string](const auto &p) {
+            std::string temp;
+            temp.insert(temp.size(), p.second, '*');
+            result_string << std::format("{:<30}:   {}\n", p.first, temp);
+        });
+
+        return format_to(fc.out(), "{}", result_string.str());
+    }
+
+    constexpr auto parse(format_parse_context &ctx) {
+        return ctx.begin();  // Просто игнорируем пользовательский формат
+    }
+};
+
+template <>
+struct formatter<std::flat_map<bookdb::Genre, double>, char> {
+    template <typename FormatContext>
+    auto format(const std::flat_map<bookdb::Genre, double> &m, FormatContext &fc) const {
+        std::stringstream result_string;
+
+        /*std::for_each(m.begin(), m.end(), [&result_string, &fc](const auto &p) {
+            std::string temp;
+            temp.insert(temp.size(), p.second, '*');
+            format_to(fc.out(), "{}", p.first);
+        });*/
+
+        std::for_each(m.begin(), m.end(), [&fc](const auto &p) {
+            std::stringstream temp;
+            // temp << std::format("{:<30}:   {}\n", p.first, p.second);
+            std::string temp_genre;
+            format_to(std::back_inserter(temp_genre), "{}", p.first);
+            temp << std::format("{:<30}:   {}\n", temp_genre, p.second);
+            format_to(fc.out(), "{}\n", temp.str());
+        });
+
+        // return format_to(fc.out(), "{}", bookdb::Genre::Fiction);
+
+        return fc.out();
     }
 
     constexpr auto parse(format_parse_context &ctx) {
@@ -123,19 +178,14 @@ constexpr auto GenreIs(bookdb::Genre genre) {
     return [genre](const bookdb::Book &book) { return book.genre >= genre; };
 }
 
-template <class InputIt, class... UnaryPred>
-constexpr bool all_of(InputIt first, InputIt last, UnaryPred... p) {
+template <class... UnaryPred>
+constexpr auto all_of(UnaryPred... p) {
     // вернём true, если число преданных передикатов равно нулю
-    return (true && ... && (std::find_if_not(first, last, p) == last));
-}
-
-template <class InputIt, class... UnaryPred>
-constexpr bool any_of(InputIt first, InputIt last, UnaryPred... p) {
-    // вернём false, если число преданных передикатов равно нулю
-    return (false || ... || (std::find_if_not(first, last, p) != last));
+    return [p...](const bookdb::Book &book) { return (true && ... && (p(book))); };
 }
 
 template <class... UnaryPred>
-constexpr bool all_of(UnaryPred... p) {
-    return true;
+constexpr bool any_of(UnaryPred... p) {
+    // вернём false, если число преданных передикатов равно нулю
+    return [p...](const bookdb::Book &book) { return (false || ... || (p(book))); };
 }
