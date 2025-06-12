@@ -49,9 +49,8 @@ public:
         InsertAuthor(author);
     }
 
-    // Правильно const?
-    BookIterator begin() /*const*/ { return books_.begin(); }
-    BookIterator end() /*const*/ { return books_.end(); }
+    BookIterator begin() { return books_.begin(); }
+    BookIterator end() { return books_.end(); }
 
     BookConstIterator cbegin() const { return books_.cbegin(); }
     BookConstIterator cend() const { return books_.cend(); }
