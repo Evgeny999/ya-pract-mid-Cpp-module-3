@@ -12,6 +12,7 @@
 
 #include "book.hpp"
 #include "book_database.hpp"
+#include "comparators.hpp"
 
 #include <print>
 #include <vector>
@@ -38,7 +39,6 @@ auto calculateGenreRatings(const BookDatabase<T> &cont) {
         double rating = 0;
     };
 
-    // std::flat_map<bookdb::Genre, BookRatingCount> books_rating_count;
     std::map<bookdb::Genre, BookRatingCount> books_rating_count;
     std::for_each(cont.cbegin(), cont.cend(), [&books_rating_count](const bookdb::Book &book) {
         if (!books_rating_count.contains(book.genre)) {
@@ -102,11 +102,8 @@ auto sampleRandomBooks(const BookDatabase<T> &cont, size_t num_books) {
     return result;
 }
 
-template <BookContainerLike T, typename Comparator = bookdb::comp::GreaterByRating>
+template <BookContainerLike T, typename Comparator = comp::GreaterByRating>
 auto getTopNBy(BookDatabase<T> &cont, int num, Comparator comp = {}) {
-    /*std::partial_sort(cont.begin(), cont.begin() + num, cont.end(),
-                      [](const auto &lhs, const auto &rhs) { return lhs.rating > rhs.rating; });
-    std::vector<std::reference_wrapper<const bookdb::Book>> result(cont.begin(), cont.begin() + num);*/
     std::partial_sort(cont.begin(), cont.begin() + num, cont.end(), comp);
     std::vector<std::reference_wrapper<const bookdb::Book>> result(cont.begin(), cont.begin() + num);
     return result;

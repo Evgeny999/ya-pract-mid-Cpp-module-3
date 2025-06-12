@@ -89,22 +89,7 @@ template <>
 struct formatter<bookdb::Book, char> {
     template <typename FormatContext>
     auto format(const bookdb::Book &b, FormatContext &fc) const {
-        std::string genre_str;
 
-        // clang-format off
-        using bookdb::Genre;
-        switch (b.genre) {
-            case Genre::Fiction:    genre_str = "Fiction"; break;
-            case Genre::Mystery:    genre_str = "Mystery"; break;
-            case Genre::NonFiction: genre_str = "NonFiction"; break;
-            case Genre::SciFi:      genre_str = "SciFi"; break;
-            case Genre::Biography:  genre_str = "Biography"; break;
-            case Genre::Unknown:    genre_str = "Unknown"; break;
-            default:
-                throw logic_error{"Unsupported bookdb::Genre"};
-            }
-
-        // clang-format on
         return format_to(fc.out(), "{} {} {} {} {} {}", b.author, b.title, b.year, b.genre, b.rating, b.read_count);
     }
 
@@ -139,22 +124,13 @@ struct formatter<std::flat_map<bookdb::Genre, double>, char> {
     auto format(const std::flat_map<bookdb::Genre, double> &m, FormatContext &fc) const {
         std::stringstream result_string;
 
-        /*std::for_each(m.begin(), m.end(), [&result_string, &fc](const auto &p) {
-            std::string temp;
-            temp.insert(temp.size(), p.second, '*');
-            format_to(fc.out(), "{}", p.first);
-        });*/
-
         std::for_each(m.begin(), m.end(), [&fc](const auto &p) {
             std::stringstream temp;
-            // temp << std::format("{:<30}:   {}\n", p.first, p.second);
             std::string temp_genre;
             format_to(std::back_inserter(temp_genre), "{}", p.first);
             temp << std::format("{:<30}:   {}\n", temp_genre, p.second);
-            format_to(fc.out(), "{}\n", temp.str());
+            format_to(fc.out(), "{}", temp.str());
         });
-
-        // return format_to(fc.out(), "{}", bookdb::Genre::Fiction);
 
         return fc.out();
     }
@@ -175,7 +151,7 @@ constexpr auto RatingAbove(double rating) {
 }
 
 constexpr auto GenreIs(bookdb::Genre genre) {
-    return [genre](const bookdb::Book &book) { return book.genre >= genre; };
+    return [genre](const bookdb::Book &book) { return book.genre == genre; };
 }
 
 template <class... UnaryPred>

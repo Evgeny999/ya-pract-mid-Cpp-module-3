@@ -84,11 +84,6 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
             format_to(fc.out(), "- {}\n", book);
         }
 
-        /*format_to(fc.out(), "Authors:\n");
-        for (const auto &author : db.GetAuthors()) {
-            format_to(fc.out(), "- {}\n", author);
-        }*/
-
         return fc.out();
     }
 
