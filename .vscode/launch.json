@@ -7,6 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Launch",
+            "program": "${workspaceFolder}/build/BookDB_tests",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Launch BookDB",
             "program": "${workspaceFolder}/build/BookDB",
             "args": [
