@@ -38,16 +38,16 @@ struct Book {
 
     constexpr Book(std::string_view title, std::string_view author, int year, std::string_view genre, double rating,
                    int read_count)
-        : title(title), author(author), year(year), genre(GenreFromString(genre)), rating(rating),
+        : author(author), title(title), year(year), genre(GenreFromString(genre)), rating(rating),
           read_count(read_count) {}
 
     constexpr Book(std::string_view title, std::string_view author, int year, Genre genre, double rating,
                    int read_count)
-        : title(title), author(author), year(year), genre(genre), rating(rating), read_count(read_count) {}
+        : author(author), title(title), year(year), genre(genre), rating(rating), read_count(read_count) {}
 
     // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом контейнере
-    std::string title;
     std::string_view author;
+    std::string title;
 
     int year;
     Genre genre;
@@ -141,27 +141,3 @@ struct formatter<std::flat_map<bookdb::Genre, double>, char> {
 };
 
 }  // namespace std
-
-constexpr auto YearBetween(int start, int end) {
-    return [start, end](const bookdb::Book &book) { return book.year >= start && book.year <= end; };
-}
-
-constexpr auto RatingAbove(double rating) {
-    return [rating](const bookdb::Book &book) { return book.rating >= rating; };
-}
-
-constexpr auto GenreIs(bookdb::Genre genre) {
-    return [genre](const bookdb::Book &book) { return book.genre == genre; };
-}
-
-template <class... UnaryPred>
-constexpr auto all_of(UnaryPred... p) {
-    // вернём true, если число преданных передикатов равно нулю
-    return [p...](const bookdb::Book &book) { return (true && ... && (p(book))); };
-}
-
-template <class... UnaryPred>
-constexpr bool any_of(UnaryPred... p) {
-    // вернём false, если число преданных передикатов равно нулю
-    return [p...](const bookdb::Book &book) { return (false || ... || (p(book))); };
-}

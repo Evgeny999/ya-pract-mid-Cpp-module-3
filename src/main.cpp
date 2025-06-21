@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <deque>
 
 #include "book_database.hpp"
 #include "comparators.hpp"

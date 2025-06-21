@@ -10,7 +10,9 @@ struct TransparentStringLess {
     using is_transparent = void;
     // Гетерогенный компаратор по названию
     bool operator()(const std::string &lhs, const Book &rhs) { return lhs < rhs.title; }
-    bool operator()(const Book &lhs, const std::string &rhs) { return lhs.title > rhs; }
+    bool operator()(const Book &lhs, const std::string &rhs) { return lhs.title < rhs; }
+    bool operator()(const std::string &lhs, const std::string &rhs) { return lhs < rhs; }
+    bool operator()(const Book &lhs, const Book &rhs) { return lhs.title < rhs.title; }
 };
 
 struct TransparentStringEqual {
@@ -18,6 +20,8 @@ struct TransparentStringEqual {
     // Гетерогенный компаратор по названию
     bool operator()(const std::string &lhs, const Book &rhs) { return lhs == rhs.title; }
     bool operator()(const Book &lhs, const std::string &rhs) { return lhs.title == rhs; }
+    bool operator()(const std::string &lhs, const std::string &rhs) { return lhs == rhs; }
+    bool operator()(const Book &lhs, const Book &rhs) { return lhs.title == rhs.title; }
 };
 
 struct TransparentStringHash {

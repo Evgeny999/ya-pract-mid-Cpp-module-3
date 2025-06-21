@@ -27,14 +27,14 @@ struct LessByGenre {
 };
 
 struct LessByRating {
-    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs, double epsilon = DBL_EPSILON) const {
-        return lhs.rating < (rhs.rating - epsilon);
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const {
+        return lhs.rating < rhs.rating;
     }
 };
 // Чтобы получать topN, нужно же использовать greater?
 struct GreaterByRating {
-    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs, double epsilon = DBL_EPSILON) const {
-        return lhs.rating > (rhs.rating - epsilon);
+    constexpr bool operator()(const bookdb::Book &lhs, const bookdb::Book &rhs) const {
+        return lhs.rating > rhs.rating;
     }
 };
 

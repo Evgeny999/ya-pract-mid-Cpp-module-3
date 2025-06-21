@@ -23,11 +23,8 @@ template <BookContainerLike T, typename Comparator = TransparentStringLess>
 auto buildAuthorHistogramFlat(const BookDatabase<T> &cont, Comparator comp = {}) {
     std::flat_map<std::string, int> result;
     std::for_each(cont.cbegin(), cont.cend(), [&result](const bookdb::Book &book) {
-        if (!result.contains(std::string{book.author})) {
-            result[std::string{book.author}] = 1;
-        } else {
-            ++result[std::string{book.author}];
-        }
+        auto [iter, _] = result.emplace(std::string{book.author}, 0);
+        iter->second++;
     });
     return result;
 }
@@ -42,34 +39,19 @@ auto calculateGenreRatings(const BookDatabase<T> &cont) {
     std::map<bookdb::Genre, BookRatingCount> books_rating_count;
     std::for_each(cont.cbegin(), cont.cend(), [&books_rating_count](const bookdb::Book &book) {
         if (!books_rating_count.contains(book.genre)) {
-            auto key = book.genre;
-            books_rating_count[key] = {1, book.rating};
+            books_rating_count[book.genre] = {1, book.rating};
         } else {
-            auto key = book.genre;
-            ++books_rating_count[key].counter;
-            books_rating_count[key].rating += book.rating;
+            ++books_rating_count[book.genre].counter;
+            books_rating_count[book.genre].rating += book.rating;
         }
     });
 
     std::flat_map<bookdb::Genre, double> result;
 
     std::for_each(books_rating_count.cbegin(), books_rating_count.cend(), [&result](const auto &pair) {
-        auto key = pair.first;
-        result[key] = pair.second.rating / pair.second.counter;
+        result.insert_or_assign(pair.first, pair.second.rating / pair.second.counter);
     });
 
-    // for (const auto &pair : books_rating_count) {
-    // clang-format off
-        /*
-        Если делать напрямую result[pair.first] =  ..., то:
-error: cannot bind rvalue reference of type 'const bookdb::Genre&&' to lvalue of type 'const std::_Flat_map_impl<bookdb::Genre, double, std::less<bookdb::Genre>, std::vector<bookdb::Genre, std::allocator<bookdb::Genre> >, std::vector<double>, false>::key_type' {aka 'const bookdb::Genre'}
- 1145 |       { return operator[]<const key_type>(__x); }
-      |                ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
-      Не очень понял - почему. Кстати с обычным map result[pair.first] бы компилировалось
-        */
-    // clang-format on
-    // result[pair.first] = pair.second.rating / pair.second.counter;
-    // }
     return result;
 }
 
@@ -82,6 +64,7 @@ auto calculateAverageRating(const BookDatabase<T> &cont) {
 
 template <BookContainerLike T>
 auto sampleRandomBooks(const BookDatabase<T> &cont, size_t num_books) {
+
     if (num_books > cont.size()) {
         num_books = cont.size();
     }

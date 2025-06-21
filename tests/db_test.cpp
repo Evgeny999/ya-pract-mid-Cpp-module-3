@@ -58,3 +58,15 @@ TEST(BookDatsabaseTest, TestFilter) {
     EXPECT_EQ(filtered.begin()->get().title, "The Catcher in the Rye");
     EXPECT_EQ((filtered.begin() + 1)->get().title, "The Hobbit");
 }
+
+TEST(BookDatsabaseTest, TestGetEmptyDb) {
+    bookdb::BookDatabase db;
+    auto authors = db.GetAuthors();
+    EXPECT_EQ(authors.size(), 0);
+}
+
+TEST(BookDatsabaseTest, TestFilterEmptyDb) {
+    bookdb::BookDatabase db;
+    auto filtered = filterBooks(db.begin(), db.end(), all_of(RatingAbove(4.9), GenreIs(bookdb::Genre::Fiction)));
+    EXPECT_EQ(filtered.size(), 0);
+}
